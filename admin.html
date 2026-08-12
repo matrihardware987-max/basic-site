@@ -545,7 +545,17 @@
           <button class="back-btn" onclick="logout()">Logout</button>
         </div>
       </div>
-
+<div class="admin-card">
+  <h3>Update Homepage Banner</h3>
+  <form class="admin-form" id="banner-form" onsubmit="updateBanner(event)">
+    <label>Upload New Banner Image</label>
+    <div class="image-inputs">
+      <input type="file" id="banner-img" accept="image/*" required />
+    </div>
+    <button type="submit" class="admin-submit">Update Banner</button>
+  </form>
+  <div id="current-banner-preview" style="margin-top: 15px;"></div>
+</div>
       <div class="admin-grid">
         <div>
           <!-- Manage Categories -->
@@ -844,7 +854,40 @@
         }
         return data.secure_url;
       }
+// --- BANNER LOGIC ---
+async function loadBannerPreview() {
+  const { data, error } = await _supabase.from('site_settings').select('banner_url').eq('id', 1).single();
+  if (data && data.banner_url) {
+    document.getElementById('current-banner-preview').innerHTML = `
+      <p style="font-size:12px; margin-bottom:5px; color:var(--ink-mid);">Current Banner:</p>
+      <img src="${data.banner_url}" style="width:100%; max-height:150px; object-fit:cover; border-radius:4px; border: 1px solid var(--border);">
+    `;
+  }
+}
 
+async function updateBanner(e) {
+  e.preventDefault();
+  document.getElementById('loading').style.display = 'flex';
+  const fileInput = document.getElementById('banner-img');
+  
+  try {
+    // 1. Upload to Cloudinary
+    const bannerUrl = await uploadToCloudinary(fileInput.files[0]);
+    
+    // 2. Update Supabase
+    const { error } = await _supabase.from('site_settings').update({ banner_url: bannerUrl }).eq('id', 1);
+    if(error) throw new Error(error.message);
+    
+    document.getElementById('banner-form').reset();
+    await loadBannerPreview(); // Refresh the preview
+    
+    document.getElementById('loading').style.display = 'none';
+    alert('Banner Updated Successfully!');
+  } catch (err) {
+    document.getElementById('loading').style.display = 'none';
+    alert("ERROR: " + err.message);
+  }
+}
       // --- SEARCH LOGIC ---
       function searchProducts() {
         const query = document.getElementById("search-box").value.toLowerCase();
