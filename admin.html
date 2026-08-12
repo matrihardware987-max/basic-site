@@ -875,7 +875,7 @@ async function updateBanner(e) {
     const bannerUrl = await uploadToCloudinary(fileInput.files[0]);
     
     // 2. Update Supabase
-    const { error } = await _supabase.from('site_settings').update({ banner_url: bannerUrl }).eq('id', 1);
+    const { error } = await _supabase.from('site_settings').upsert({ id: 1, banner_url: bannerUrl });
     if(error) throw new Error(error.message);
     
     document.getElementById('banner-form').reset();
