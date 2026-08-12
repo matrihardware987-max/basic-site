@@ -865,39 +865,51 @@ async function loadBanner() {
   }
 }
 // --- WHATSAPP EXIT INTENT LOGIC ---
+let trapSet = false;
+
+// 1. Set the trap only AFTER they touch or scroll the page (Browser Security Rule)
+function setBackTrap() {
+  if (!trapSet && !sessionStorage.getItem('waExitShown')) {
+    history.pushState({ trapped: true }, '');
+    trapSet = true;
+  }
+}
+
+// Listen for the first touch, scroll, or click
+document.addEventListener('click', setBackTrap, { once: true });
+document.addEventListener('touchstart', setBackTrap, { once: true });
+document.addEventListener('scroll', setBackTrap, { once: true });
+
 function showWaModal() {
-  // Only show it once per session so we don't annoy the user
   if (sessionStorage.getItem('waExitShown')) return;
-  
   const modal = document.getElementById('wa-exit-modal');
   modal.style.display = 'flex';
   sessionStorage.setItem('waExitShown', 'true');
-
-  // Push a state into the browser history (The Mobile trick)
-  history.pushState({ waPopupOpen: true }, '');
 }
 
 function closeWaModal() {
   document.getElementById('wa-exit-modal').style.display = 'none';
 }
 
-// 1. DESKTOP EXIT INTENT: Mouse leaves the top of the window
+// 2. DESKTOP EXIT: Mouse leaves top of screen
 document.addEventListener('mouseleave', function(e) {
   if (e.clientY < 10) {
     showWaModal();
   }
 });
 
-// 2. MOBILE BACK BUTTON TRICK
+// 3. MOBILE EXIT: Back button pressed
 window.addEventListener('popstate', function(event) {
   const modal = document.getElementById('wa-exit-modal');
-  // If they hit back while the modal is open, close the modal instead of leaving
+  
   if (modal.style.display === 'flex') {
+    // If the modal is open and they press back, just close the modal
     modal.style.display = 'none';
-    // The history state is automatically popped, so the next back press leaves the site
-  } else {
-    // If modal is closed but they try to swipe back quickly on mobile, try to catch them!
+  } else if (!sessionStorage.getItem('waExitShown')) {
+    // If they hit back to leave the site, catch them!
     showWaModal();
+    // Re-push a state so if they hit back a SECOND time, it closes the modal instead of leaving
+    history.pushState({ trapped: true }, '');
   }
 });
 loadBanner(); // Make sure this is still at the bottom!
