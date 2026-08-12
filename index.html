@@ -832,7 +832,7 @@ async function loadBanner() {
         setInterval(() => {
           currentSlide = (currentSlide + 1) % carouselImages.length; // Loops back to 0 at the end
           heroDiv.style.backgroundImage = `url('${carouselImages[currentSlide]}')`;
-        }, 4000); // 4000 milliseconds = 4 seconds per slide
+        }, 10000); // 4000 milliseconds = 4 seconds per slide
       }
     }
   } catch (err) {
