@@ -799,11 +799,32 @@
         window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`, "_blank");
       }
       async function loadBanner() {
-  const { data, error } = await _supabase.from('site_settings').select('banner_url').eq('id', 1).single();
-  if (data && data.banner_url) {
-    document.getElementById('hero-banner').style.backgroundImage = `url('${data.banner_url}')`;
+  try {
+    // 1. Fetch the URL from Supabase
+    const { data, error } = await _supabase.from('site_settings').select('banner_url').eq('id', 1).single();
+    
+    if (error) throw error;
+
+    // 2. If we have a URL, force it onto the hero banner
+    if (data && data.banner_url) {
+      const heroDiv = document.getElementById('hero-banner');
+      
+      // Apply the image
+      heroDiv.style.backgroundImage = `url('${data.banner_url}')`;
+      
+      // Force the CSS settings via JavaScript so nothing can override them
+      heroDiv.style.backgroundSize = "cover";
+      heroDiv.style.backgroundPosition = "center";
+      heroDiv.style.backgroundRepeat = "no-repeat";
+      heroDiv.style.backgroundColor = "transparent"; // Removes any solid colors hiding the image
+    }
+  } catch (err) {
+    console.error("Could not load banner:", err.message);
   }
 }
+
+// Ensure this runs when the page loads!
+loadBanner();
     </script>
   <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79"}' crossorigin="anonymous"></script>
 </body>
