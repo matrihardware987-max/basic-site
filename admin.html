@@ -546,13 +546,16 @@
         </div>
       </div>
 <div class="admin-card">
-  <h3>Update Homepage Banner</h3>
+  <h3>Update Homepage Carousel (Up to 4)</h3>
   <form class="admin-form" id="banner-form" onsubmit="updateBanner(event)">
-    <label>Upload New Banner Image</label>
+    <label>Upload Carousel Images (Leave blank to keep existing ones)</label>
     <div class="image-inputs">
-      <input type="file" id="banner-img" accept="image/*" required />
+      <div style="display:flex; align-items:center; gap:10px;"><span style="font-size:12px; font-weight:600;">Slot 1:</span><input type="file" id="banner-img-1" accept="image/*" /></div>
+      <div style="display:flex; align-items:center; gap:10px;"><span style="font-size:12px; font-weight:600;">Slot 2:</span><input type="file" id="banner-img-2" accept="image/*" /></div>
+      <div style="display:flex; align-items:center; gap:10px;"><span style="font-size:12px; font-weight:600;">Slot 3:</span><input type="file" id="banner-img-3" accept="image/*" /></div>
+      <div style="display:flex; align-items:center; gap:10px;"><span style="font-size:12px; font-weight:600;">Slot 4:</span><input type="file" id="banner-img-4" accept="image/*" /></div>
     </div>
-    <button type="submit" class="admin-submit">Update Banner</button>
+    <button type="submit" class="admin-submit">Update Carousel</button>
   </form>
   <div id="current-banner-preview" style="margin-top: 15px;"></div>
 </div>
@@ -857,33 +860,40 @@
       }
 // --- BANNER LOGIC ---
 async function loadBannerPreview() {
-  const { data, error } = await _supabase.from('site_settings').select('banner_url').eq('id', 1).single();
-  if (data && data.banner_url) {
-    document.getElementById('current-banner-preview').innerHTML = `
-      <p style="font-size:12px; margin-bottom:5px; color:var(--ink-mid);">Current Banner:</p>
-      <img src="${data.banner_url}" style="width:100%; max-height:150px; object-fit:cover; border-radius:4px; border: 1px solid var(--border);">
-    `;
+  const { data, error } = await _supabase.from('site_settings').select('*').order('id', { ascending: true });
+  if (data) {
+    let html = '<p style="font-size:12px; margin-bottom:5px; color:var(--ink-mid);">Current Carousel Images:</p><div style="display:flex; gap:10px; overflow-x:auto;">';
+    data.forEach(row => {
+      if(row.banner_url) {
+        html += `<img src="${row.banner_url}" style="width:80px; height:50px; object-fit:cover; border-radius:4px; border: 1px solid var(--border);">`;
+      }
+    });
+    html += '</div>';
+    document.getElementById('current-banner-preview').innerHTML = html;
   }
 }
 
 async function updateBanner(e) {
   e.preventDefault();
   document.getElementById('loading').style.display = 'flex';
-  const fileInput = document.getElementById('banner-img');
   
   try {
-    // 1. Upload to Cloudinary
-    const bannerUrl = await uploadToCloudinary(fileInput.files[0]);
-    
-    // 2. Update Supabase
-    const { error } = await _supabase.from('site_settings').upsert({ id: 1, banner_url: bannerUrl });
-    if(error) throw new Error(error.message);
+    // Loop through all 4 inputs
+    for(let i = 1; i <= 4; i++) {
+      const fileInput = document.getElementById(`banner-img-${i}`);
+      // Only upload and save if the admin actually selected a file for this slot
+      if(fileInput.files && fileInput.files[0]) {
+        const bannerUrl = await uploadToCloudinary(fileInput.files[0]);
+        const { error } = await _supabase.from('site_settings').upsert({ id: i, banner_url: bannerUrl });
+        if(error) throw new Error(error.message);
+      }
+    }
     
     document.getElementById('banner-form').reset();
-    await loadBannerPreview(); // Refresh the preview
+    await loadBannerPreview(); // Refresh the row of previews
     
     document.getElementById('loading').style.display = 'none';
-    alert('Banner Updated Successfully!');
+    alert('Carousel Updated Successfully!');
   } catch (err) {
     document.getElementById('loading').style.display = 'none';
     alert("ERROR: " + err.message);
