@@ -566,6 +566,13 @@
           padding: 40px 20px;
         }
       }
+      #hero-banner {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-blend-mode: overlay; 
+  background-color:rgba(255,255,255, 0.4); 
+}
     </style>
   </head>
   <body>
@@ -791,6 +798,12 @@
         const msg = `Hi, I am interested in purchasing:%0A%0A*${currentProduct.name}*%0ASKU: ${currentProduct.sku}%0APrice: ${currentProduct.price}`;
         window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`, "_blank");
       }
+      async function loadBanner() {
+  const { data, error } = await _supabase.from('site_settings').select('banner_url').eq('id', 1).single();
+  if (data && data.banner_url) {
+    document.getElementById('hero-banner').style.backgroundImage = `url('${data.banner_url}')`;
+  }
+}
     </script>
   <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79"}' crossorigin="anonymous"></script>
 </body>
