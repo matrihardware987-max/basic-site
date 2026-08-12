@@ -1,0 +1,1051 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Admin Dashboard - MATRI HARDWARES | Madhyamgram</title>
+
+    <!-- Supabase Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- Bootstrap 5 (animations & utilities) -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- AOS – Animate On Scroll -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css"
+      rel="stylesheet"
+    />
+
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Cormorant+Garant:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@300;400;500;600&display=swap");
+
+      :root {
+        /* ── 60 / 30 / 10 THEME ── */
+        --dominant: #fbf2d5; /* 60% background */
+        --secondary: #fdc57b; /* 30% structure */
+        --accent: #394a51; /* 10% action */
+
+        --white: #fffdf6;
+        --ink: var(--accent);
+        --ink-mid: #5c6b72;
+        --bronze: #e0a542;
+        --gold-deep: #a97b1f;
+        --border: #eedfbe;
+        --admin-bg: var(--dominant);
+        --danger: #d93025;
+        --success: #1ebe57;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Inter", sans-serif;
+        background: var(--admin-bg);
+        color: var(--ink);
+        -webkit-font-smoothing: antialiased;
+      }
+      ::selection {
+        background: var(--secondary);
+        color: var(--ink);
+      }
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(18px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      @keyframes popIn {
+        from {
+          opacity: 0;
+          transform: scale(0.94) translateY(14px);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1) translateY(0);
+        }
+      }
+
+      /* ── LOGIN SCREEN ── */
+      #login-screen {
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background:
+          radial-gradient(
+            ellipse at 15% 15%,
+            rgba(253, 197, 123, 0.4),
+            transparent 55%
+          ),
+          radial-gradient(
+            ellipse at 85% 90%,
+            rgba(57, 74, 81, 0.12),
+            transparent 50%
+          ),
+          var(--dominant);
+        position: relative;
+        overflow: hidden;
+      }
+      #login-screen::before {
+        content: "";
+        position: absolute;
+        inset: 20px;
+        border: 1px solid var(--border);
+        pointer-events: none;
+      }
+      .login-box {
+        padding: 44px 40px;
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        width: 100%;
+        max-width: 400px;
+        text-align: center;
+        background: var(--white);
+        box-shadow: 0 24px 60px rgba(57, 74, 81, 0.14);
+        position: relative;
+        z-index: 2;
+        animation: popIn 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+      }
+      .login-box::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 24px;
+        right: 24px;
+        height: 4px;
+        border-radius: 0 0 4px 4px;
+        background: linear-gradient(to right, var(--secondary), var(--bronze));
+      }
+      .login-brand {
+        font-family: "Cormorant Garant", serif;
+        font-size: 15px;
+        letter-spacing: 5px;
+        text-transform: uppercase;
+        color: var(--gold-deep);
+        margin-bottom: 4px;
+      }
+      .login-loc {
+        font-size: 9px;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        color: var(--ink-mid);
+        margin-bottom: 18px;
+      }
+      .login-box h2 {
+        font-family: "Cormorant Garant", serif;
+        font-size: 32px;
+        margin-bottom: 20px;
+        color: var(--ink);
+      }
+      .login-box input {
+        width: 100%;
+        padding: 15px;
+        margin-bottom: 15px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        font-family: "Inter";
+        background: #fff;
+        transition: all 0.3s;
+        outline: none;
+      }
+      .login-box input:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(57, 74, 81, 0.12);
+      }
+      .login-box button {
+        width: 100%;
+        padding: 15px;
+        background: var(--accent);
+        color: white;
+        border: none;
+        border-radius: 999px;
+        cursor: pointer;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+        box-shadow: 0 10px 22px rgba(57, 74, 81, 0.25);
+      }
+      .login-box button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 16px 30px rgba(57, 74, 81, 0.35);
+        background: #2c3a40;
+      }
+
+      /* ── ADMIN DASHBOARD ── */
+      #admin-dashboard {
+        display: none;
+        padding: 40px;
+      }
+      .admin-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        padding: 22px 28px;
+        background: var(--accent);
+        border-radius: 14px;
+        box-shadow: 0 14px 34px rgba(57, 74, 81, 0.28);
+        animation: fadeUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+      }
+      .admin-header h2 {
+        font-family: "Cormorant Garant", serif;
+        font-size: 34px;
+        color: #fff;
+      }
+      .admin-header .sub {
+        font-size: 9px;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        color: var(--secondary);
+        margin-top: 2px;
+      }
+      .back-btn {
+        background: rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        border-radius: 999px;
+        padding: 10px 20px;
+        cursor: pointer;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        text-decoration: none;
+        color: #fff;
+        transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+        display: inline-block;
+      }
+      .back-btn:hover {
+        background: var(--secondary);
+        border-color: var(--secondary);
+        color: var(--ink);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 18px rgba(0, 0, 0, 0.2);
+      }
+
+      .admin-grid {
+        display: grid;
+        grid-template-columns: 1fr 2.5fr;
+        gap: 30px;
+        align-items: flex-start;
+      }
+      .admin-card {
+        background: var(--white);
+        padding: 30px;
+        border-radius: 14px;
+        border: 1px solid var(--border);
+        box-shadow: 0 10px 28px rgba(57, 74, 81, 0.08);
+        margin-bottom: 30px;
+        animation: fadeUp 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+        transition: box-shadow 0.3s;
+      }
+      .admin-card:hover {
+        box-shadow: 0 16px 40px rgba(57, 74, 81, 0.13);
+      }
+      .admin-card h3 {
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 20px;
+        color: var(--ink-mid);
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 10px;
+        position: relative;
+      }
+      .admin-card h3::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        bottom: -1px;
+        width: 38px;
+        height: 2px;
+        border-radius: 2px;
+        background: linear-gradient(to right, var(--secondary), var(--bronze));
+      }
+
+      .admin-form {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+      }
+      .admin-form label {
+        font-size: 12px;
+        font-weight: 600;
+        margin-bottom: -10px;
+        color: var(--ink);
+      }
+      .admin-form input,
+      .admin-form select,
+      .admin-form textarea {
+        padding: 12px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        font-family: "Inter";
+        width: 100%;
+        background: #fff;
+        outline: none;
+        transition: all 0.3s;
+      }
+      .admin-form input:focus,
+      .admin-form select:focus,
+      .admin-form textarea:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(57, 74, 81, 0.1);
+      }
+      .admin-submit {
+        background: var(--accent);
+        color: #fff;
+        border: none;
+        padding: 15px;
+        cursor: pointer;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        border-radius: 999px;
+        margin-top: 10px;
+        transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+        box-shadow: 0 10px 22px rgba(57, 74, 81, 0.22);
+      }
+      .admin-submit:hover {
+        transform: translateY(-3px);
+        background: #2c3a40;
+        box-shadow: 0 16px 30px rgba(57, 74, 81, 0.32);
+      }
+      .image-inputs {
+        background: var(--dominant);
+        padding: 15px;
+        border-radius: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        border: 1px dashed var(--bronze);
+      }
+      .image-inputs input[type="file"] {
+        background: var(--white);
+        cursor: pointer;
+      }
+
+      /* ── SEARCH BAR ── */
+      .search-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+      }
+      .search-input {
+        padding: 11px 16px;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        font-family: "Inter";
+        width: 300px;
+        outline: none;
+        background: #fff;
+        transition: all 0.3s;
+      }
+      .search-input:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(57, 74, 81, 0.1);
+        width: 340px;
+      }
+
+      .admin-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      .admin-table th {
+        background: var(--dominant);
+        padding: 15px;
+        text-align: left;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--ink);
+        border-bottom: 2px solid var(--secondary);
+      }
+      .admin-table td {
+        padding: 15px;
+        border-bottom: 1px solid var(--border);
+        font-size: 13px;
+        vertical-align: middle;
+      }
+      .admin-table tbody tr {
+        transition: background 0.25s;
+        animation: fadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+      }
+      .admin-table tbody tr:hover {
+        background: rgba(253, 197, 123, 0.14);
+      }
+      .admin-table img {
+        width: 50px;
+        height: 50px;
+        object-fit: contain;
+        background: var(--dominant);
+        border-radius: 8px;
+        padding: 5px;
+        border: 1px solid var(--border);
+      }
+
+      .action-btn {
+        background: transparent;
+        border: none;
+        font-size: 12px;
+        cursor: pointer;
+        padding: 6px 14px;
+        border-radius: 999px;
+        font-weight: 500;
+        transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+      .action-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 14px rgba(57, 74, 81, 0.2);
+      }
+      .btn-edit {
+        color: var(--ink);
+        background: var(--secondary);
+        margin-right: 5px;
+      }
+      .btn-del {
+        color: var(--white);
+        background: var(--danger);
+      }
+      .cat-list-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px;
+        border-bottom: 1px solid var(--border);
+        font-size: 13px;
+        transition: background 0.25s;
+      }
+      .cat-list-item:hover {
+        background: rgba(253, 197, 123, 0.14);
+      }
+      .cat-list-item button {
+        background: none;
+        border: none;
+        color: var(--danger);
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 600;
+        transition: transform 0.25s;
+      }
+      .cat-list-item button:hover {
+        transform: scale(1.08);
+      }
+
+      #edit-modal {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(57, 74, 81, 0.75);
+        backdrop-filter: blur(4px);
+        z-index: 10000;
+        align-items: center;
+        justify-content: center;
+      }
+      .edit-content {
+        background: var(--white);
+        width: 90%;
+        max-width: 600px;
+        padding: 40px;
+        border-radius: 16px;
+        border-top: 5px solid var(--secondary);
+        max-height: 90vh;
+        overflow-y: auto;
+        position: relative;
+        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.3);
+        animation: popIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+      }
+      .close-edit {
+        position: absolute;
+        top: 15px;
+        right: 20px;
+        font-size: 24px;
+        cursor: pointer;
+        color: var(--ink-mid);
+        transition: all 0.25s;
+      }
+      .close-edit:hover {
+        color: var(--danger);
+        transform: rotate(90deg);
+      }
+      .loading-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(251, 242, 213, 0.85);
+        backdrop-filter: blur(3px);
+        z-index: 99999;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 18px;
+        color: var(--ink);
+      }
+
+      @media (max-width: 900px) {
+        .admin-grid {
+          grid-template-columns: 1fr;
+        }
+        .admin-header {
+          flex-direction: column;
+          gap: 14px;
+          text-align: center;
+        }
+        .search-input {
+          width: 100%;
+        }
+        .search-input:focus {
+          width: 100%;
+        }
+      }
+    </style>
+    <base target="_blank" />
+  </head>
+  <body>
+    <div id="loading" class="loading-overlay">Processing... Please wait.</div>
+
+    <!-- LOGIN SCREEN -->
+    <div id="login-screen">
+      <div class="login-box">
+        <div class="login-brand">Matri Hardwares</div>
+        <div class="login-loc">Madhyamgram</div>
+        <h2>Admin Login</h2>
+        <input type="email" id="admin-email" placeholder="Admin Email" />
+        <input
+          type="password"
+          id="admin-pass"
+          placeholder="Password"
+          onkeypress="if (event.key === 'Enter') login();"
+        />
+        <button onclick="login()">Enter Dashboard</button>
+      </div>
+    </div>
+
+    <!-- ADMIN DASHBOARD -->
+    <div id="admin-dashboard">
+      <div class="admin-header">
+        <div>
+          <h2>Catalogue Management</h2>
+          <div class="sub">Matri Hardwares &nbsp;&bull;&nbsp; Madhyamgram</div>
+        </div>
+        <div>
+          <a
+            href="index.html"
+            class="back-btn"
+            target="_blank"
+            style="margin-right: 10px"
+            >View Live Site</a
+          >
+          <button class="back-btn" onclick="logout()">Logout</button>
+        </div>
+      </div>
+
+      <div class="admin-grid">
+        <div>
+          <!-- Manage Categories -->
+          <div class="admin-card">
+            <h3>Manage Categories</h3>
+            <div id="admin-cat-list" style="margin-bottom: 15px"></div>
+            <div style="display: flex; gap: 10px">
+              <input
+                type="text"
+                id="new-cat-input"
+                placeholder="New Category Name"
+                style="
+                  flex: 1;
+                  padding: 10px;
+                  border: 1px solid var(--border);
+                  border-radius: 8px;
+                  outline: none;
+                "
+              />
+              <button
+                onclick="addCategory()"
+                style="
+                  background: var(--accent);
+                  color: white;
+                  border: none;
+                  padding: 0 18px;
+                  cursor: pointer;
+                  border-radius: 8px;
+                  letter-spacing: 1px;
+                "
+              >
+                ADD
+              </button>
+            </div>
+          </div>
+
+          <!-- Add Product -->
+          <div class="admin-card">
+            <h3>Add New Product</h3>
+            <form class="admin-form" id="add-form" onsubmit="addProduct(event)">
+              <label>Product Name</label
+              ><input type="text" id="add-name" required />
+              <label>SKU (Must be unique)</label
+              ><input type="text" id="add-sku" required /> <label>Price</label
+              ><input
+                type="text"
+                id="add-price"
+                placeholder="e.g. ₹ 12,500"
+                required
+              />
+              <label>Category</label
+              ><select id="add-cat" required></select>
+              <label>Available Pieces (Stock)</label
+              ><input type="number" id="add-stock" min="0" required />
+              <label>Description & Dimensions</label
+              ><textarea id="add-desc" rows="3" required></textarea>
+
+              <label>Upload Product Images (Max 5)</label>
+              <div class="image-inputs">
+                <input type="file" id="add-img-1" accept="image/*" required />
+                <input type="file" id="add-img-2" accept="image/*" />
+                <input type="file" id="add-img-3" accept="image/*" />
+                <input type="file" id="add-img-4" accept="image/*" />
+                <input type="file" id="add-img-5" accept="image/*" />
+              </div>
+              <button type="submit" class="admin-submit">Add Product</button>
+            </form>
+          </div>
+        </div>
+
+        <div class="admin-card table-panel">
+          <div class="search-container">
+            <h3 style="border: none; margin: 0; padding: 0">
+              Manage Inventory
+            </h3>
+            <!-- LIVE SEARCH BAR -->
+            <input
+              type="text"
+              id="search-box"
+              class="search-input"
+              placeholder="Search by Name or SKU..."
+              oninput="searchProducts()"
+            />
+          </div>
+
+          <div style="overflow-x: auto">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Image</th>
+                  <th>Name & SKU</th>
+                  <th>Category</th>
+                  <th>Price</th>
+                  <th>Stock</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="admin-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EDIT MODAL -->
+    <div id="edit-modal">
+      <div class="edit-content">
+        <span
+          class="close-edit"
+          onclick="document.getElementById('edit-modal').style.display = 'none'"
+          >&times;</span
+        >
+        <h3
+          style="
+            margin-bottom: 20px;
+            font-family: &quot;Cormorant Garant&quot;, serif;
+            font-size: 28px;
+            color: var(--ink);
+          "
+        >
+          Edit Product
+        </h3>
+        <form
+          class="admin-form"
+          id="edit-form"
+          onsubmit="saveEditProduct(event)"
+        >
+          <input type="hidden" id="edit-id" />
+          <label>Product Name</label
+          ><input type="text" id="edit-name" required />
+          <label>SKU (Must be unique)</label
+          ><input type="text" id="edit-sku" required /> <label>Price</label
+          ><input type="text" id="edit-price" required /> <label>Category</label
+          ><select id="edit-cat" required></select>
+          <label>Available Pieces</label
+          ><input type="number" id="edit-stock" min="0" required />
+          <label>Description</label
+          ><textarea id="edit-desc" rows="3" required></textarea>
+
+          <label>Update Images (Leave blank to keep existing)</label>
+          <div class="image-inputs">
+            <input type="file" id="edit-img-1" accept="image/*" />
+            <input type="file" id="edit-img-2" accept="image/*" />
+            <input type="file" id="edit-img-3" accept="image/*" />
+            <input type="file" id="edit-img-4" accept="image/*" />
+            <input type="file" id="edit-img-5" accept="image/*" />
+          </div>
+          <button type="submit" class="admin-submit">Save Changes</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- AOS + Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+      // ==========================================
+      // CONFIGURATION (REPLACE THESE VALUES)
+      // ==========================================
+      const SUPABASE_URL = "https://wnsqhrzukchlsohqpkem.supabase.co";
+      // Make sure there are NO spaces or line breaks inside these quotes!
+      const SUPABASE_ANON_KEY =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Induc3Focnp1a2NobHNvaHFwa2VtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY1NDcwMzYsImV4cCI6MjEwMjEyMzAzNn0.ZaaDqBF-Z-4euA0SnCxA3AVh5ujJ0zfAAusOULqGPw8";
+      const CLOUDINARY_URL =
+        "https://api.cloudinary.com/v1_1/mvztf6wv/image/upload";
+      const CLOUDINARY_PRESET = "mhwmgm";
+
+      const _supabase = supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_ANON_KEY.trim(),
+      );
+
+      let categories = [];
+      let products = [];
+
+      // --- REAL SECURE AUTHENTICATION ---
+      async function checkSession() {
+        const {
+          data: { session },
+        } = await _supabase.auth.getSession();
+        if (session) {
+          showDashboard();
+        }
+      }
+
+      // Run this when the page loads
+      checkSession();
+
+      // --- AUTHENTICATION ---
+      async function login() {
+        document.getElementById("loading").style.display = "flex";
+        const email = document.getElementById("admin-email").value;
+        const pass = document.getElementById("admin-pass").value;
+
+        const { data, error } = await _supabase.auth.signInWithPassword({
+          email: email,
+          password: pass,
+        });
+
+        document.getElementById("loading").style.display = "none";
+
+        if (error) {
+          alert("Login failed: " + error.message);
+        } else {
+          showDashboard();
+        }
+      }
+      async function logout() {
+        await _supabase.auth.signOut();
+        location.reload();
+      }
+      function showDashboard() {
+        document.getElementById("login-screen").style.display = "none";
+        document.getElementById("admin-dashboard").style.display = "block";
+        loadData();
+      }
+
+      // --- LOAD DATA ---
+      async function loadData() {
+        const defaultCategories = [
+          "Sanitaryware",
+          "Designer Sanitary",
+          "Steel & Quartz Sink",
+          "Designware",
+          "TT Marble & White",
+          "Vanity & LED Mirror",
+          "TT Premium",
+        ];
+        if (!localStorage.getItem("pb_categories"))
+          localStorage.setItem(
+            "pb_categories",
+            JSON.stringify(defaultCategories),
+          );
+        categories = JSON.parse(localStorage.getItem("pb_categories"));
+        renderCategories();
+
+        const { data, error } = await _supabase
+          .from("products")
+          .select("*")
+          .order("id", { ascending: false });
+        if (error) console.error("Supabase load error:", error);
+        else {
+          products = data;
+          renderAdminTable(products);
+        }
+      }
+
+      // --- CATEGORY LOGIC ---
+      function renderCategories() {
+        const adminCatList = document.getElementById("admin-cat-list");
+        adminCatList.innerHTML = "";
+        categories.forEach((cat, index) => {
+          adminCatList.innerHTML += `<div class="cat-list-item"><span>${cat}</span><button type="button" onclick="deleteCategory(${index})">Delete</button></div>`;
+        });
+        const addSelect = document.getElementById("add-cat");
+        const editSelect = document.getElementById("edit-cat");
+        addSelect.innerHTML = `<option value="">Select Category</option>`;
+        editSelect.innerHTML = "";
+        categories.forEach((cat) => {
+          addSelect.innerHTML += `<option value="${cat}">${cat}</option>`;
+          editSelect.innerHTML += `<option value="${cat}">${cat}</option>`;
+        });
+      }
+      function addCategory() {
+        const val = document.getElementById("new-cat-input").value.trim();
+        if (val && !categories.includes(val)) {
+          categories.push(val);
+          localStorage.setItem("pb_categories", JSON.stringify(categories));
+          document.getElementById("new-cat-input").value = "";
+          renderCategories();
+        }
+      }
+      function deleteCategory(index) {
+        if (confirm("Delete this category?")) {
+          categories.splice(index, 1);
+          localStorage.setItem("pb_categories", JSON.stringify(categories));
+          renderCategories();
+        }
+      }
+
+      // --- CLOUDINARY UPLOAD HELPER ---
+      async function uploadToCloudinary(file) {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("upload_preset", CLOUDINARY_PRESET.trim());
+
+        const res = await fetch(CLOUDINARY_URL.trim(), {
+          method: "POST",
+          body: formData,
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.error?.message || "Cloudinary Upload Failed");
+        }
+        return data.secure_url;
+      }
+
+      // --- SEARCH LOGIC ---
+      function searchProducts() {
+        const query = document.getElementById("search-box").value.toLowerCase();
+        const filtered = products.filter(
+          (p) =>
+            p.name.toLowerCase().includes(query) ||
+            (p.sku && p.sku.toLowerCase().includes(query)),
+        );
+        renderAdminTable(filtered);
+      }
+
+      // --- PRODUCT LOGIC ---
+      function renderAdminTable(dataToRender) {
+        const tbody = document.getElementById("admin-tbody");
+        tbody.innerHTML = "";
+        dataToRender.forEach((p) => {
+          const coverImg = p.images && p.images.length > 0 ? p.images[0] : "";
+          tbody.innerHTML += `
+        <tr>
+          <td><img src="${coverImg}" alt="img"></td>
+          <td><strong>${p.name}</strong><br><span style="color:var(--ink-mid); font-size:11px;">SKU: ${p.sku || "N/A"}</span></td>
+          <td>${p.category}</td>
+          <td>${p.price}</td>
+          <td><span style="font-weight:600; color:${p.stock <= 1 ? "var(--danger)" : "var(--success)"}">${p.stock}</span></td>
+          <td>
+            <button class="action-btn btn-edit" onclick="openEditModal(${p.id})">Edit</button>
+            <button class="action-btn btn-del" onclick="deleteProduct(${p.id})">Delete</button>
+          </td>
+        </tr>`;
+        });
+      }
+
+      async function addProduct(e) {
+        e.preventDefault();
+
+        const newSku = document.getElementById("add-sku").value.trim();
+        const skuExists = products.some(
+          (p) => p.sku && p.sku.toLowerCase() === newSku.toLowerCase(),
+        );
+        if (skuExists) {
+          alert(
+            "Error: This SKU already exists! Please use a unique SKU for each product.",
+          );
+          return;
+        }
+
+        document.getElementById("loading").style.display = "flex";
+        let uploadedImages = [];
+
+        // STEP 1: UPLOAD TO CLOUDINARY
+        try {
+          for (let i = 1; i <= 5; i++) {
+            const fileInput = document.getElementById(`add-img-${i}`);
+            if (fileInput.files && fileInput.files[0]) {
+              const url = await uploadToCloudinary(fileInput.files[0]);
+              uploadedImages.push(url);
+            }
+          }
+        } catch (err) {
+          document.getElementById("loading").style.display = "none";
+          alert("CLOUDINARY ERROR: " + err.message);
+          return; // Stop the process here
+        }
+
+        // STEP 2: SAVE TO SUPABASE
+        try {
+          const newProd = {
+            name: document.getElementById("add-name").value,
+            sku: newSku,
+            price: document.getElementById("add-price").value,
+            category: document.getElementById("add-cat").value,
+            stock: parseInt(document.getElementById("add-stock").value),
+            description: document.getElementById("add-desc").value,
+            images: uploadedImages,
+          };
+
+          const { error } = await _supabase.from("products").insert([newProd]);
+
+          if (error) {
+            // Supabase provides a specific error message format
+            throw new Error(error.message || JSON.stringify(error));
+          }
+
+          document.getElementById("add-form").reset();
+          await loadData();
+          document.getElementById("search-box").value = "";
+
+          document.getElementById("loading").style.display = "none";
+          alert("Product Added Successfully!");
+        } catch (err) {
+          document.getElementById("loading").style.display = "none";
+          alert("SUPABASE ERROR: " + err.message);
+        }
+      }
+
+      async function deleteProduct(id) {
+        if (
+          confirm("Are you sure you want to permanently delete this product?")
+        ) {
+          document.getElementById("loading").style.display = "flex";
+          const { error } = await _supabase
+            .from("products")
+            .delete()
+            .eq("id", id);
+          document.getElementById("loading").style.display = "none";
+
+          if (error) alert("SUPABASE DELETE ERROR: " + error.message);
+          else {
+            await loadData();
+            document.getElementById("search-box").value = "";
+          }
+        }
+      }
+
+      function openEditModal(id) {
+        const prod = products.find((p) => p.id === id);
+        if (!prod) return;
+        document.getElementById("edit-id").value = prod.id;
+        document.getElementById("edit-name").value = prod.name;
+        document.getElementById("edit-sku").value = prod.sku || "";
+        document.getElementById("edit-price").value = prod.price;
+        document.getElementById("edit-cat").value = prod.category;
+        document.getElementById("edit-stock").value = prod.stock;
+        document.getElementById("edit-desc").value = prod.description;
+        for (let i = 1; i <= 5; i++)
+          document.getElementById(`edit-img-${i}`).value = "";
+        document.getElementById("edit-modal").style.display = "flex";
+      }
+
+      async function saveEditProduct(e) {
+        e.preventDefault();
+        const id = parseInt(document.getElementById("edit-id").value);
+        const editedSku = document.getElementById("edit-sku").value.trim();
+
+        const skuExists = products.some(
+          (p) =>
+            p.sku &&
+            p.sku.toLowerCase() === editedSku.toLowerCase() &&
+            p.id !== id,
+        );
+        if (skuExists) {
+          alert("Error: This SKU already exists on another product!");
+          return;
+        }
+
+        document.getElementById("loading").style.display = "flex";
+        let finalImages = [];
+        const prod = products.find((p) => p.id === id);
+
+        // STEP 1: CLOUDINARY UPLOAD
+        try {
+          for (let i = 1; i <= 5; i++) {
+            const fileInput = document.getElementById(`edit-img-${i}`);
+            if (fileInput.files && fileInput.files[0]) {
+              const url = await uploadToCloudinary(fileInput.files[0]);
+              finalImages.push(url);
+            } else if (prod.images && prod.images[i - 1]) {
+              finalImages.push(prod.images[i - 1]);
+            }
+          }
+        } catch (err) {
+          document.getElementById("loading").style.display = "none";
+          alert("CLOUDINARY ERROR: " + err.message);
+          return;
+        }
+
+        // STEP 2: SUPABASE UPDATE
+        try {
+          const updatedProd = {
+            name: document.getElementById("edit-name").value,
+            sku: editedSku,
+            price: document.getElementById("edit-price").value,
+            category: document.getElementById("edit-cat").value,
+            stock: parseInt(document.getElementById("edit-stock").value),
+            description: document.getElementById("edit-desc").value,
+            images: finalImages,
+          };
+
+          const { error } = await _supabase
+            .from("products")
+            .update(updatedProd)
+            .eq("id", id);
+          if (error) throw new Error(error.message || JSON.stringify(error));
+
+          document.getElementById("edit-modal").style.display = "none";
+          await loadData();
+          document.getElementById("search-box").value = "";
+          document.getElementById("loading").style.display = "none";
+          alert("Product Updated Successfully!");
+        } catch (err) {
+          document.getElementById("loading").style.display = "none";
+          alert("SUPABASE ERROR: " + err.message);
+        }
+      }
+    </script>
+    <script
+      type="module"
+      src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496"
+      integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ=="
+      data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79"}'
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>

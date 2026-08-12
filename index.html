@@ -1,0 +1,797 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>MATRI HARDWARES – Master Product Catalogue | Madhyamgram</title>
+
+    <!-- Supabase Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- Bootstrap 5 (animations & utilities) -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- AOS – Animate On Scroll -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css"
+      rel="stylesheet"
+    />
+
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Cormorant+Garant:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@300;400;500;600&display=swap");
+
+      :root {
+        /* ── 60 / 30 / 10 THEME ── */
+        --dominant: #fbf2d5; /* 60% background */
+        --secondary: #fdc57b; /* 30% structure */
+        --accent: #394a51; /* 10% action */
+
+        --cream: var(--dominant);
+        --white: #fffdf6;
+        --ink: var(--accent);
+        --ink-mid: #5c6b72;
+        --ink-faint: #9aa7ab;
+        --bronze: #e0a542;
+        --bronze-lt: rgba(253, 197, 123, 0.28);
+        --gold-deep: #a97b1f;
+        --border: #eedfbe;
+        --danger: #d93025;
+        --success: #1ebe57;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Inter", sans-serif;
+        background: var(--cream);
+        color: var(--ink);
+        -webkit-font-smoothing: antialiased;
+      }
+      button {
+        font-family: "Inter", sans-serif;
+      }
+      ::selection {
+        background: var(--secondary);
+        color: var(--ink);
+      }
+
+      /* ── COVER & FILTERS ── */
+      .cover {
+        min-height: 100vh;
+        background:
+          radial-gradient(
+            ellipse at 20% 10%,
+            rgba(253, 197, 123, 0.35),
+            transparent 55%
+          ),
+          radial-gradient(
+            ellipse at 85% 90%,
+            rgba(57, 74, 81, 0.1),
+            transparent 50%
+          ),
+          var(--dominant);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        position: relative;
+        padding: 40px 20px;
+        overflow: hidden;
+      }
+      .cover::before {
+        content: "";
+        position: absolute;
+        inset: 20px;
+        border: 1px solid var(--border);
+        pointer-events: none;
+      }
+      .cover::after {
+        content: "";
+        position: absolute;
+        inset: 26px;
+        border: 1px solid rgba(253, 197, 123, 0.55);
+        pointer-events: none;
+      }
+      .brand {
+        font-family: "Cormorant Garant", serif;
+        font-size: 62px;
+        font-weight: 300;
+        letter-spacing: 14px;
+        text-transform: uppercase;
+        color: var(--ink);
+        animation: brandReveal 1.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+      }
+      .brand span {
+        color: var(--gold-deep);
+        font-style: italic;
+      }
+      @keyframes brandReveal {
+        from {
+          opacity: 0;
+          letter-spacing: 30px;
+          transform: translateY(24px);
+        }
+        to {
+          opacity: 1;
+          letter-spacing: 14px;
+          transform: translateY(0);
+        }
+      }
+      .store-loc {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 14px;
+        font-size: 10px;
+        letter-spacing: 4px;
+        text-transform: uppercase;
+        color: var(--white);
+        background: var(--accent);
+        padding: 7px 18px;
+        border-radius: 999px;
+        box-shadow: 0 8px 20px rgba(57, 74, 81, 0.25);
+        animation: fadeUp 1s 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+      }
+      .store-loc::before {
+        content: "";
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--secondary);
+        animation: pulse 1.8s infinite;
+      }
+      .tagline {
+        font-size: 9px;
+        color: var(--ink-mid);
+        letter-spacing: 6px;
+        text-transform: uppercase;
+        margin: 26px 0 32px;
+        animation: fadeUp 1s 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+      }
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(18px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .gold-bar {
+        width: 60px;
+        height: 2px;
+        margin: 0 auto 32px;
+        border-radius: 2px;
+        background: linear-gradient(
+          to right,
+          transparent,
+          var(--secondary),
+          var(--bronze),
+          var(--secondary),
+          transparent
+        );
+        background-size: 200% 100%;
+        animation: shimmer 3s linear infinite;
+      }
+      @keyframes shimmer {
+        0% {
+          background-position: 200% 0;
+        }
+        100% {
+          background-position: -200% 0;
+        }
+      }
+      .cat-title {
+        font-family: "Cormorant Garant", serif;
+        font-style: italic;
+        font-size: 17px;
+        color: var(--ink-mid);
+        letter-spacing: 2px;
+        margin-bottom: 32px;
+        animation: fadeUp 1s 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+      }
+
+      .cover-pills {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: center;
+        max-width: 860px;
+        z-index: 2;
+        position: relative;
+        animation: fadeUp 1s 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+      }
+      .pill {
+        background: rgba(255, 253, 246, 0.7);
+        border: 1px solid var(--border);
+        color: var(--ink-mid);
+        padding: 7px 18px;
+        border-radius: 999px;
+        font-size: 9px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+      .pill:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 18px rgba(57, 74, 81, 0.14);
+        border-color: var(--secondary);
+        color: var(--ink);
+      }
+      .pill.active {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: #fff;
+        box-shadow: 0 10px 22px rgba(57, 74, 81, 0.3);
+      }
+
+      /* ── CATALOGUE GRID ── */
+      .section {
+        background: var(--cream);
+        margin-top: 20px;
+      }
+      .section-header {
+        background: var(--white);
+        border-top: 3px solid var(--accent);
+        border-bottom: 1px solid var(--border);
+        padding: 48px 40px 42px;
+        position: relative;
+        overflow: hidden;
+      }
+      .section-header::after {
+        content: "";
+        position: absolute;
+        left: 40px;
+        bottom: 30px;
+        width: 46px;
+        height: 3px;
+        border-radius: 3px;
+        background: linear-gradient(to right, var(--secondary), var(--bronze));
+      }
+      .section-header h2 {
+        font-family: "Cormorant Garant", serif;
+        font-size: 44px;
+        font-weight: 300;
+        text-transform: uppercase;
+        color: var(--ink);
+      }
+      .product-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 1px;
+        background: var(--border);
+      }
+      .card {
+        background: var(--white);
+        cursor: pointer;
+        transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+        position: relative;
+      }
+      .card::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 3px;
+        background: linear-gradient(to right, var(--secondary), var(--accent));
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+      .card:hover {
+        box-shadow: 0 18px 44px rgba(57, 74, 81, 0.16);
+        transform: translateY(-6px);
+        z-index: 10;
+      }
+      .card:hover::after {
+        transform: scaleX(1);
+      }
+      .img-box {
+        width: 100%;
+        aspect-ratio: 1/1;
+        background: linear-gradient(145deg, #fffdf6, var(--dominant));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        overflow: hidden;
+      }
+      .img-box img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        mix-blend-mode: multiply;
+        transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+      .card:hover .img-box img {
+        transform: scale(1.07);
+      }
+      .card-body {
+        padding: 16px 18px 20px;
+        border-top: 1px solid var(--border);
+      }
+      .prod-name {
+        font-family: "Cormorant Garant", serif;
+        font-size: 17px;
+        font-weight: 600;
+        margin-bottom: 5px;
+        color: var(--ink);
+      }
+      .mrp {
+        font-family: "Cormorant Garant", serif;
+        font-size: 21px;
+        color: var(--gold-deep);
+        margin-bottom: 10px;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 8.5px;
+        padding: 3px 9px;
+        border: 1px solid;
+        border-radius: 999px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+      }
+      .badge::before {
+        content: "";
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+      }
+      .hi {
+        color: #3d7a52;
+        border-color: rgba(61, 122, 82, 0.2);
+        background: rgba(61, 122, 82, 0.06);
+      }
+      .hi::before {
+        background: #3d7a52;
+      }
+      .lo {
+        color: var(--danger);
+        border-color: rgba(217, 48, 37, 0.2);
+        background: rgba(217, 48, 37, 0.05);
+        font-weight: 600;
+      }
+      .lo::before {
+        background: var(--danger);
+        animation: pulse 1.5s infinite;
+      }
+      @keyframes pulse {
+        0% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.2;
+        }
+        100% {
+          opacity: 1;
+        }
+      }
+
+      /* ── FULL-SCREEN PRODUCT MODAL ── */
+      #product-view {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: var(--white);
+        z-index: 9999;
+        overflow-y: auto;
+        animation: pageIn 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+      @keyframes pageIn {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .product-page-layout {
+        display: flex;
+        min-height: 100vh;
+      }
+      .product-image-side {
+        flex: 1.2;
+        background: linear-gradient(160deg, var(--dominant), #fff8e6);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 40px;
+        position: relative;
+      }
+      .main-img-display {
+        width: 100%;
+        max-width: 500px;
+        height: 400px;
+        object-fit: contain;
+        mix-blend-mode: multiply;
+        margin-bottom: 20px;
+        animation: fadeUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+      }
+      .gallery-thumbs {
+        display: flex;
+        gap: 10px;
+      }
+      .gallery-thumbs img {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        border: 2px solid transparent;
+        cursor: pointer;
+        border-radius: 8px;
+        transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+      .gallery-thumbs img:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 16px rgba(57, 74, 81, 0.18);
+      }
+      .gallery-thumbs img.active {
+        border-color: var(--accent);
+        box-shadow: 0 6px 14px rgba(57, 74, 81, 0.2);
+      }
+      .back-btn {
+        position: absolute;
+        top: 30px;
+        left: 30px;
+        background: var(--white);
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        padding: 10px 20px;
+        cursor: pointer;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--ink);
+        transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+        z-index: 5;
+      }
+      .back-btn:hover {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: var(--white);
+        transform: translateX(-4px);
+        box-shadow: 0 8px 18px rgba(57, 74, 81, 0.3);
+      }
+      .product-details-side {
+        flex: 1;
+        padding: 80px 60px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+      .pd-cat {
+        font-size: 10px;
+        color: var(--ink-faint);
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        margin-bottom: 15px;
+      }
+      .pd-title {
+        font-family: "Cormorant Garant", serif;
+        font-size: 48px;
+        font-weight: 300;
+        line-height: 1.1;
+        margin-bottom: 20px;
+        color: var(--ink);
+      }
+      .pd-price {
+        font-size: 28px;
+        font-family: "Cormorant Garant", serif;
+        color: var(--gold-deep);
+        margin-bottom: 30px;
+      }
+      .pd-desc {
+        font-size: 15px;
+        color: var(--ink-mid);
+        line-height: 1.6;
+        margin-bottom: 40px;
+        border-top: 1px solid var(--border);
+        padding-top: 30px;
+        white-space: pre-wrap;
+      }
+      .whatsapp-btn {
+        background: #25d366;
+        color: white;
+        border: none;
+        border-radius: 999px;
+        padding: 18px 30px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+        width: 100%;
+        max-width: 350px;
+        box-shadow: 0 10px 24px rgba(37, 211, 102, 0.25);
+      }
+      .whatsapp-btn:hover {
+        background: #1ebe57;
+        transform: translateY(-3px) scale(1.02);
+        box-shadow: 0 16px 32px rgba(37, 211, 102, 0.35);
+      }
+      .whatsapp-btn:active {
+        transform: translateY(0) scale(0.99);
+      }
+
+      /* footer strip */
+      .site-footer {
+        background: var(--accent);
+        color: rgba(255, 255, 255, 0.85);
+        text-align: center;
+        padding: 34px 20px;
+        font-size: 10px;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+      }
+      .site-footer strong {
+        font-family: "Cormorant Garant", serif;
+        font-size: 20px;
+        letter-spacing: 6px;
+        display: block;
+        margin-bottom: 8px;
+        color: var(--secondary);
+      }
+
+      @media (max-width: 900px) {
+        .brand {
+          font-size: 38px;
+          letter-spacing: 8px;
+        }
+        .product-page-layout {
+          flex-direction: column;
+        }
+        .product-image-side {
+          padding: 60px 20px;
+        }
+        .product-details-side {
+          padding: 40px 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="customer-view">
+      <div class="cover">
+        <div class="cover-inner">
+          <div class="brand">Matri <span>Hard</span>wares</div>
+          <div class="store-loc">Madhyamgram</div>
+          <div class="tagline">
+            Quality &nbsp;&bull;&nbsp; Design &nbsp;&bull;&nbsp; Excellence
+          </div>
+          <div class="gold-bar"></div>
+          <div class="cat-title">Master Product Catalogue</div>
+          <div class="cover-pills" id="dynamic-pills"></div>
+        </div>
+        
+      </div>
+      <div id="catalog-container">
+        <p style="text-align: center; padding: 50px">Loading Products...</p>
+      </div>
+      <footer class="site-footer">
+        <strong>Matri Hardwares</strong>
+        Madhyamgram &nbsp;&bull;&nbsp; Quality Bathware &amp; Hardware
+      </footer>
+    </div>
+
+    <div id="product-view">
+      <div class="product-page-layout">
+        <div class="product-image-side">
+          <button class="back-btn" onclick="closeProductPage()">
+            &larr; Back to Catalogue
+          </button>
+          <img id="pd-image" class="main-img-display" src="" alt="Product" />
+          <div class="gallery-thumbs" id="pd-gallery"></div>
+        </div>
+        <div class="product-details-side">
+          <div id="pd-cat" class="pd-cat">CATEGORY</div>
+          <h1 id="pd-title" class="pd-title">Product Name</h1>
+          <div id="pd-price" class="pd-price">₹ 0.00</div>
+          <div id="pd-badge-container" style="margin-bottom: 30px"></div>
+          <div class="pd-desc" id="pd-desc">Description here.</div>
+          <button class="whatsapp-btn" onclick="sendToWhatsApp()">
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+              <path
+                d="M12.031 0C5.385 0 0 5.385 0 12.031c0 2.124.553 4.195 1.605 6.01L.53 24l6.105-1.045c1.766.953 3.766 1.455 5.865 1.455 6.646 0 12.031-5.385 12.031-12.031S18.677 0 12.031 0zm3.875 17.208c-.161.457-.935.867-1.309.914-.374.047-.962.13-2.735-.606-2.124-.882-3.486-3.056-3.59-3.195-.104-.14-.856-1.144-.856-2.394.004-.15.068-.535.253-.734.184-.2.398-.25.535-.25.137 0 .274.004.382.01.12.006.282-.046.44.33.167.397.57 1.396.618 1.492.05.097.08.21.01.385-.07.17-.107.278-.21.4-.107.12-.224.264-.32.368-.107.114-.217.237-.094.425.12.188.535.866 1.14 1.402.78.694 1.433.908 1.62.997.186.09.294.076.402-.04.107-.117.464-.537.588-.72.124-.184.248-.153.42-.088.174.065 1.096.516 1.284.61.188.093.313.14.36.218.046.076.046.447-.115.904z"
+              />
+            </svg>
+            Inquire on WhatsApp
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- AOS + Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+      // ==========================================
+      // CONFIGURATION (REPLACE THESE VALUES)
+      // ==========================================
+      const SUPABASE_URL = "https://wnsqhrzukchlsohqpkem.supabase.co";
+      const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Induc3Focnp1a2NobHNvaHFwa2VtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY1NDcwMzYsImV4cCI6MjEwMjEyMzAzNn0.ZaaDqBF-Z-4euA0SnCxA3AVh5ujJ0zfAAusOULqGPw8"; // <--- PASTE ANON KEY HERE
+      const WHATSAPP_NUMBER = "7003723504"; // <--- PASTE YOUR BUSINESS NUMBER HERE
+
+      const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+      // Init AOS scroll animations
+      AOS.init({ duration: 800, easing: "ease-out-cubic", once: true, offset: 60 });
+
+      let categories = [];
+      let products = [];
+      let activeFilter = "All";
+      let currentProduct = null;
+
+      document.addEventListener("DOMContentLoaded", async () => {
+        // 1. Get Categories from Local Storage
+        const defaultCategories = [
+          "Sanitaryware",
+          "Designer Sanitary",
+          "Steel & Quartz Sink",
+          "Designware",
+          "TT Marble & White",
+          "Vanity & LED Mirror",
+          "TT Premium",
+        ];
+        if (!localStorage.getItem("pb_categories"))
+          localStorage.setItem(
+            "pb_categories",
+            JSON.stringify(defaultCategories),
+          );
+        categories = JSON.parse(localStorage.getItem("pb_categories"));
+        renderPills();
+
+        // 2. Fetch Products from Supabase
+        const { data, error } = await _supabase
+          .from("products")
+          .select("*")
+          .order("id", { ascending: false });
+        if (error) {
+          document.getElementById("catalog-container").innerHTML =
+            "<p>Error loading products.</p>";
+          console.error(error);
+        } else {
+          products = data;
+          renderCatalogue();
+        }
+      });
+
+      function renderPills() {
+        const container = document.getElementById("dynamic-pills");
+        container.innerHTML = `<button class="pill ${activeFilter === "All" ? "active" : ""}" onclick="filterCatalog('All')">ALL PRODUCTS</button>`;
+        categories.forEach((cat) => {
+          container.innerHTML += `<button class="pill ${activeFilter === cat ? "active" : ""}" onclick="filterCatalog('${cat}')">${cat.toUpperCase()}</button>`;
+        });
+      }
+
+      function filterCatalog(cat) {
+        activeFilter = cat;
+        renderPills();
+        renderCatalogue();
+      }
+
+      function getStockBadge(stock) {
+        if (stock === 0) return `<span class="badge lo">Out of Stock</span>`;
+        if (stock === 1)
+          return `<span class="badge lo">Hurry, only 1 left!</span>`;
+        return `<span class="badge hi">In Stock</span>`;
+      }
+
+      function renderCatalogue() {
+        const container = document.getElementById("catalog-container");
+        container.innerHTML = "";
+        let filtered =
+          activeFilter === "All"
+            ? products
+            : products.filter((p) => p.category === activeFilter);
+
+        if (filtered.length === 0) {
+          container.innerHTML = `<p style="text-align:center; padding:50px; color:var(--ink-mid);">No products available in this category.</p>`;
+          return;
+        }
+
+        const grouped = {};
+        filtered.forEach((p) => {
+          if (!grouped[p.category]) grouped[p.category] = [];
+          grouped[p.category].push(p);
+        });
+
+        for (const cat in grouped) {
+          let html = `<div class="section"><div class="section-header" data-aos="fade-right"><h2>${cat}</h2></div><div class="product-grid">`;
+          grouped[cat].forEach((p, idx) => {
+            const coverImg = p.images && p.images.length > 0 ? p.images[0] : "";
+            html += `
+            <div class="card" data-aos="fade-up" data-aos-delay="${(idx % 4) * 90}" onclick="openProductPage(${p.id})">
+              <div class="img-box"><img src="${coverImg}" alt="${p.name}"></div>
+              <div class="card-body">
+                <div class="prod-name">${p.name}</div>
+                <div style="font-size:9px; color:#9aa7ab; font-family:monospace; margin-bottom:8px;">SKU: ${p.sku}</div>
+                <div class="mrp">${p.price}</div>
+                ${getStockBadge(p.stock)}
+              </div>
+            </div>`;
+          });
+          html += `</div></div>`;
+          container.innerHTML += html;
+        }
+        AOS.refresh();
+      }
+
+      function openProductPage(id) {
+        currentProduct = products.find((p) => p.id === id);
+        document.getElementById("pd-title").innerText = currentProduct.name;
+        document.getElementById("pd-cat").innerText =
+          `SKU: ${currentProduct.sku} | ${currentProduct.category}`;
+        document.getElementById("pd-price").innerText = currentProduct.price;
+        document.getElementById("pd-desc").innerText =
+          currentProduct.description;
+        document.getElementById("pd-badge-container").innerHTML = getStockBadge(
+          currentProduct.stock,
+        );
+
+        const mainImg = document.getElementById("pd-image");
+        const gallery = document.getElementById("pd-gallery");
+        mainImg.src =
+          currentProduct.images && currentProduct.images.length > 0
+            ? currentProduct.images[0]
+            : "";
+
+        gallery.innerHTML = "";
+        if (currentProduct.images && currentProduct.images.length > 1) {
+          currentProduct.images.forEach((imgUrl, idx) => {
+            gallery.innerHTML += `<img src="${imgUrl}" onclick="setMainImage('${imgUrl}', this)" class="${idx === 0 ? "active" : ""}">`;
+          });
+        }
+
+        document.getElementById("customer-view").style.display = "none";
+        document.getElementById("product-view").style.display = "block";
+        window.scrollTo(0, 0);
+      }
+
+      function closeProductPage() {
+        document.getElementById("product-view").style.display = "none";
+        document.getElementById("customer-view").style.display = "block";
+        window.scrollTo(0, 0);
+      }
+
+      function setMainImage(url, el) {
+        const mainImg = document.getElementById("pd-image");
+        mainImg.style.animation = "none";
+        void mainImg.offsetWidth; // restart transition animation
+        mainImg.style.animation = "";
+        mainImg.src = url;
+        document
+          .querySelectorAll(".gallery-thumbs img")
+          .forEach((img) => img.classList.remove("active"));
+        el.classList.add("active");
+      }
+
+      function sendToWhatsApp() {
+        if (currentProduct.stock === 0)
+          return alert("Sorry, this item is out of stock!");
+        const msg = `Hi, I am interested in purchasing:%0A%0A*${currentProduct.name}*%0ASKU: ${currentProduct.sku}%0APrice: ${currentProduct.price}`;
+        window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`, "_blank");
+      }
+    </script>
+  <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79"}' crossorigin="anonymous"></script>
+</body>
+</html>
