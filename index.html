@@ -798,33 +798,49 @@
         const msg = `Hi, I am interested in purchasing:%0A%0A*${currentProduct.name}*%0ASKU: ${currentProduct.sku}%0APrice: ${currentProduct.price}`;
         window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`, "_blank");
       }
-      async function loadBanner() {
+      let carouselImages = [];
+let currentSlide = 0;
+
+async function loadBanner() {
   try {
-    // 1. Fetch the URL from Supabase
-    const { data, error } = await _supabase.from('site_settings').select('banner_url').eq('id', 1).single();
-    
+    // Fetch all rows from site_settings
+    const { data, error } = await _supabase.from('site_settings').select('banner_url').order('id', { ascending: true });
     if (error) throw error;
 
-    // 2. If we have a URL, force it onto the hero banner
-    if (data && data.banner_url) {
+    if (data) {
+      // Filter out any blank slots to create our final array of URLs
+      carouselImages = data.map(row => row.banner_url).filter(url => url && url.trim() !== '');
+    }
+
+    if (carouselImages.length > 0) {
       const heroDiv = document.getElementById('hero-banner');
       
-      // Apply the image
-      heroDiv.style.backgroundImage = `url('${data.banner_url}')`;
-      
-      // Force the CSS settings via JavaScript so nothing can override them
+      // Force the background settings via JS
       heroDiv.style.backgroundSize = "cover";
       heroDiv.style.backgroundPosition = "center";
       heroDiv.style.backgroundRepeat = "no-repeat";
-      heroDiv.style.backgroundColor = "transparent"; // Removes any solid colors hiding the image
+      heroDiv.style.backgroundColor = "transparent";
+      
+      // This single line creates a beautiful, smooth fade effect!
+      heroDiv.style.transition = "background-image 1.5s ease-in-out"; 
+
+      // Set the very first image immediately
+      heroDiv.style.backgroundImage = `url('${carouselImages[0]}')`;
+
+      // If there is more than 1 image, start the automatic slideshow
+      if (carouselImages.length > 1) {
+        setInterval(() => {
+          currentSlide = (currentSlide + 1) % carouselImages.length; // Loops back to 0 at the end
+          heroDiv.style.backgroundImage = `url('${carouselImages[currentSlide]}')`;
+        }, 4000); // 4000 milliseconds = 4 seconds per slide
+      }
     }
   } catch (err) {
-    console.error("Could not load banner:", err.message);
+    console.error("Could not load carousel:", err.message);
   }
 }
 
-// Ensure this runs when the page loads!
-loadBanner();
+loadBanner(); // Make sure this is still at the bottom!
     </script>
   <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79"}' crossorigin="anonymous"></script>
 </body>
