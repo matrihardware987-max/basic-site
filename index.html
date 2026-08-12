@@ -725,7 +725,7 @@
               <div class="card-body">
                 <div class="prod-name">${p.name}</div>
                 <div style="font-size:9px; color:#9aa7ab; font-family:monospace; margin-bottom:8px;">SKU: ${p.sku}</div>
-                <div class="mrp">${p.price}</div>
+                <div class="mrp">Price: ${p.price}</div>
                 ${getStockBadge(p.stock)}
               </div>
             </div>`;
@@ -741,7 +741,7 @@
         document.getElementById("pd-title").innerText = currentProduct.name;
         document.getElementById("pd-cat").innerText =
           `SKU: ${currentProduct.sku} | ${currentProduct.category}`;
-        document.getElementById("pd-price").innerText = currentProduct.price;
+        document.getElementById("pd-price").innerText = `Price: ${currentProduct.price}`;
         document.getElementById("pd-desc").innerText =
           currentProduct.description;
         document.getElementById("pd-badge-container").innerHTML = getStockBadge(
