@@ -841,23 +841,31 @@
         }
       }
 
-      // --- CLOUDINARY UPLOAD HELPER ---
-      async function uploadToCloudinary(file) {
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("upload_preset", CLOUDINARY_PRESET.trim());
+ // --- CLOUDINARY UPLOAD HELPER (WITH AUTO WEBP CONVERSION) ---
+     async function uploadToCloudinary(file) {
+       // 1. Automatically convert any image format to high-res, low-space WebP
+       let optimizedFile = file;
+       try {
+         optimizedFile = await convertToWebP(file);
+       } catch (e) {
+         console.warn("WebP conversion skipped, using original file", e);
+       }
 
-        const res = await fetch(CLOUDINARY_URL.trim(), {
-          method: "POST",
-          body: formData,
-        });
-        const data = await res.json();
+       const formData = new FormData();
+       formData.append("file", optimizedFile);
+       formData.append("upload_preset", CLOUDINARY_PRESET.trim());
 
-        if (!res.ok) {
-          throw new Error(data.error?.message || "Cloudinary Upload Failed");
-        }
-        return data.secure_url;
-      }
+       const res = await fetch(CLOUDINARY_URL.trim(), {
+         method: "POST",
+         body: formData,
+       });
+       const data = await res.json();
+
+       if (!res.ok) {
+         throw new Error(data.error?.message || "Cloudinary Upload Failed");
+       }
+       return data.secure_url;
+     }
 // --- BANNER LOGIC ---
 async function loadBannerPreview() {
   const { data, error } = await _supabase.from('site_settings').select('*').order('id', { ascending: true });
@@ -1093,6 +1101,61 @@ async function updateBanner(e) {
           alert("SUPABASE ERROR: " + err.message);
         }
       }
+      // --- AUTO WEBP CONVERTER HELPER ---
+function convertToWebP(file) {
+  return new Promise((resolve, reject) => {
+    // If it's already a webp, we can skip conversion
+    if (file.type === 'image/webp') {
+      resolve(file);
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target.result;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+
+        // Optional: Cap max width/height to 1600px to keep file sizes tiny and high-res
+        const MAX_DIMENSION = 1600;
+        if (width > height && width > MAX_DIMENSION) {
+          height = Math.round((height * MAX_DIMENSION) / width);
+          width = MAX_DIMENSION;
+        } else if (height > MAX_DIMENSION) {
+          width = Math.round((width * MAX_DIMENSION) / height);
+          height = MAX_DIMENSION;
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+
+        // Convert canvas image to WebP format with 0.85 quality (High resolution, extremely low file space)
+        canvas.toBlob((blob) => {
+          if (!blob) {
+            reject(new Error('Canvas to WebP conversion failed'));
+            return;
+          }
+          // Create a new clean file object with a .webp extension
+          const newFileName = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
+          const webpFile = new File([blob], `${newFileName}.webp`, {
+            type: 'image/webp',
+            lastModified: Date.now()
+          });
+          resolve(webpFile);
+        }, 'image/webp', 0.85);
+      };
+      img.onerror = (err) => reject(err);
+    };
+    reader.onerror = (err) => reject(err);
+  });
+}
     </script>
     <script
       type="module"
