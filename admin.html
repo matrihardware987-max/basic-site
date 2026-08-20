@@ -611,6 +611,7 @@
               />
               <label>Category</label
               ><select id="add-cat" required></select>
+              <input type="text" id="add-sub-cat" placeholder="Sub-Category / Group (Optional, e.g. Vitrossa Set)" style="width: 100%; padding: 10px; margin-top: 15px; border: 1px solid var(--border); border-radius: 4px; background: var(--bg-color); color: var(--ink-dark);" />
               <label>Available Pieces (Stock)</label
               ><input type="number" id="add-stock" min="0" required />
               <label>Description & Dimensions</label
@@ -693,6 +694,7 @@
           ><input type="text" id="edit-sku" required /> <label>Price</label
           ><input type="text" id="edit-price"  /> <label>Category</label
           ><select id="edit-cat" required></select>
+          <input type="text" id="edit-sub-cat" placeholder="Sub-Category / Group (Optional)" style="width: 100%; padding: 10px; margin-top: 15px; border: 1px solid var(--border); border-radius: 4px; background: var(--bg-color); color: var(--ink-dark);" />
           <label>Available Pieces</label
           ><input type="number" id="edit-stock" min="0" required />
           <label>Description</label
@@ -973,11 +975,12 @@ async function updateBanner(e) {
 
         // STEP 2: SAVE TO SUPABASE
         try {
-          const newProd = {
+         const newProd = {
             name: document.getElementById("add-name").value,
             sku: newSku,
             price: document.getElementById("add-price").value,
             category: document.getElementById("add-cat").value,
+            sub_category: document.getElementById("add-sub-cat").value, // <-- NEW LINE
             stock: parseInt(document.getElementById("add-stock").value),
             description: document.getElementById("add-desc").value,
             images: uploadedImages,
@@ -1028,7 +1031,7 @@ async function updateBanner(e) {
         document.getElementById("edit-name").value = prod.name;
         document.getElementById("edit-sku").value = prod.sku || "";
         document.getElementById("edit-price").value = prod.price;
-        document.getElementById("edit-cat").value = prod.category;
+        document.getElementById("edit-sub-cat").value = prod.sub_category || "";
         document.getElementById("edit-stock").value = prod.stock;
         document.getElementById("edit-desc").value = prod.description;
         for (let i = 1; i <= 5; i++)
@@ -1080,6 +1083,7 @@ async function updateBanner(e) {
             sku: editedSku,
             price: document.getElementById("edit-price").value,
             category: document.getElementById("edit-cat").value,
+            sub_category: document.getElementById("edit-sub-cat").value, // <-- NEW LINE
             stock: parseInt(document.getElementById("edit-stock").value),
             description: document.getElementById("edit-desc").value,
             images: finalImages,
