@@ -1,0 +1,408 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Your Cart | Matri Hardwares – Madhyamgram</title>
+
+    <!-- Bootstrap 5 (animations & utilities) -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- AOS – Animate On Scroll -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css"
+      rel="stylesheet"
+    />
+
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Cormorant+Garant:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@300;400;500;600&display=swap");
+
+      :root {
+        /* ── 60 / 30 / 10 THEME ── */
+        --dominant: #fbf2d5; /* 60% background */
+        --secondary: #fdc57b; /* 30% structure */
+        --accent: #394a51; /* 10% action */
+
+        --white: #fffdf6;
+        --ink: var(--accent);
+        --ink-mid: #5c6b72;
+        --bronze: #e0a542;
+        --gold-deep: #a97b1f;
+        --border: #eedfbe;
+        --danger: #d93025;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Inter", sans-serif;
+        background:
+          radial-gradient(
+            ellipse at 15% 10%,
+            rgba(253, 197, 123, 0.35),
+            transparent 55%
+          ),
+          radial-gradient(
+            ellipse at 85% 95%,
+            rgba(57, 74, 81, 0.1),
+            transparent 50%
+          ),
+          var(--dominant);
+        color: var(--ink);
+        padding: 20px;
+        max-width: 640px;
+        margin: 0 auto;
+        min-height: 100vh;
+        -webkit-font-smoothing: antialiased;
+      }
+      ::selection {
+        background: var(--secondary);
+        color: var(--ink);
+      }
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(18px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      @keyframes popIn {
+        from {
+          opacity: 0;
+          transform: scale(0.95) translateY(14px);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1) translateY(0);
+        }
+      }
+      @keyframes shimmer {
+        0% {
+          background-position: 200% 0;
+        }
+        100% {
+          background-position: -200% 0;
+        }
+      }
+
+      /* ── STORE HEADER ── */
+      .cart-brand {
+        text-align: center;
+        padding: 34px 10px 26px;
+        animation: fadeUp 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+      }
+      .cart-brand .name {
+        font-family: "Cormorant Garant", serif;
+        font-size: 34px;
+        font-weight: 300;
+        letter-spacing: 8px;
+        text-transform: uppercase;
+        color: var(--ink);
+      }
+      .cart-brand .name span {
+        color: var(--gold-deep);
+        font-style: italic;
+      }
+      .cart-brand .loc {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        margin-top: 10px;
+        font-size: 9px;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        color: #fff;
+        background: var(--accent);
+        padding: 6px 16px;
+        border-radius: 999px;
+        box-shadow: 0 8px 18px rgba(57, 74, 81, 0.25);
+      }
+      .cart-brand .loc::before {
+        content: "";
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: var(--secondary);
+        animation: pulse 1.8s infinite;
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.2;
+        }
+      }
+      .gold-bar {
+        width: 56px;
+        height: 2px;
+        margin: 20px auto 0;
+        border-radius: 2px;
+        background: linear-gradient(
+          to right,
+          transparent,
+          var(--secondary),
+          var(--bronze),
+          var(--secondary),
+          transparent
+        );
+        background-size: 200% 100%;
+        animation: shimmer 3s linear infinite;
+      }
+
+      h2 {
+        font-family: "Cormorant Garant", serif;
+        font-size: 26px;
+        font-weight: 600;
+        letter-spacing: 1px;
+        margin: 26px 0 14px;
+        color: var(--ink);
+        position: relative;
+        padding-bottom: 10px;
+        animation: fadeUp 0.9s 0.15s cubic-bezier(0.22, 1, 0.36, 1) both;
+      }
+      h2::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 42px;
+        height: 3px;
+        border-radius: 3px;
+        background: linear-gradient(to right, var(--secondary), var(--bronze));
+      }
+
+      /* ── CART CARD ── */
+      .cart-card {
+        background: var(--white);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 10px 22px 22px;
+        box-shadow: 0 16px 40px rgba(57, 74, 81, 0.1);
+        animation: popIn 0.7s 0.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+      }
+      .cart-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 14px;
+        padding: 16px 0;
+        border-bottom: 1px solid var(--border);
+        animation: fadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+        transition: background 0.25s;
+      }
+      .cart-item:hover {
+        background: rgba(253, 197, 123, 0.12);
+      }
+      .cart-item:last-child {
+        border-bottom: none;
+      }
+      .cart-item strong {
+        color: var(--ink);
+      }
+      .cart-item > div:last-child {
+        font-family: "Cormorant Garant", serif;
+        font-size: 19px;
+        font-weight: 600;
+        color: var(--gold-deep);
+        white-space: nowrap;
+      }
+      .cart-item p,
+      #cart-items-container > p {
+        color: var(--ink-mid);
+        padding: 22px 0;
+        margin: 0;
+        text-align: center;
+      }
+
+      .cart-total {
+        font-family: "Cormorant Garant", serif;
+        font-size: 26px;
+        font-weight: 600;
+        margin-top: 20px;
+        padding-top: 16px;
+        text-align: right;
+        color: var(--ink);
+        border-top: 2px solid var(--secondary);
+        animation: fadeUp 0.9s 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+      }
+      .cart-total span {
+        color: var(--gold-deep);
+      }
+
+      .disclaimer {
+        font-size: 13px;
+        color: var(--ink-mid);
+        margin-top: 16px;
+        background: rgba(253, 197, 123, 0.22);
+        border: 1px solid var(--border);
+        border-left: 4px solid var(--secondary);
+        padding: 14px 16px;
+        border-radius: 10px;
+        line-height: 1.6;
+        animation: fadeUp 0.9s 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+      }
+      .disclaimer strong {
+        color: var(--ink);
+      }
+
+      .checkout-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        width: 100%;
+        padding: 17px;
+        margin-top: 30px;
+        background: #25d366;
+        color: white;
+        text-align: center;
+        text-decoration: none;
+        font-size: 15px;
+        font-weight: 600;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        border-radius: 999px;
+        box-shadow: 0 12px 28px rgba(37, 211, 102, 0.3);
+        transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+        animation: fadeUp 0.9s 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+      }
+      .checkout-btn:hover {
+        background: #1ebe57;
+        color: #fff;
+        transform: translateY(-3px) scale(1.01);
+        box-shadow: 0 18px 36px rgba(37, 211, 102, 0.4);
+      }
+      .checkout-btn:active {
+        transform: translateY(0) scale(0.99);
+      }
+
+      .clear-btn {
+        background: none;
+        border: none;
+        color: var(--danger);
+        text-decoration: underline;
+        text-underline-offset: 3px;
+        cursor: pointer;
+        margin: 22px 0 40px;
+        display: block;
+        text-align: center;
+        width: 100%;
+        font-family: "Inter", sans-serif;
+        font-size: 13px;
+        letter-spacing: 0.5px;
+        transition: all 0.3s;
+        animation: fadeUp 0.9s 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+      }
+      .clear-btn:hover {
+        color: #a8231b;
+        transform: translateY(-2px);
+      }
+
+      @media (max-width: 480px) {
+        .cart-brand .name {
+          font-size: 26px;
+          letter-spacing: 5px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="cart-brand">
+      <div class="name">Matri <span>Hard</span>wares</div>
+      <div><span class="loc">Madhyamgram</span></div>
+      <div class="gold-bar"></div>
+    </div>
+
+    <h2>Your Shopping Cart</h2>
+
+    <div class="cart-card">
+      <div id="cart-items-container"></div>
+    </div>
+
+    <div class="cart-total">Total: ₹<span id="grand-total">0</span></div>
+
+    <div class="disclaimer">
+      <strong>Note:</strong> This is the base product cost. GST will be added to
+      the final invoice. Please contact us on WhatsApp to confirm your order and
+      get the final price including taxes.
+    </div>
+
+    <a href="#" id="wa-checkout" class="checkout-btn">SEND ORDER TO WHATSAPP</a>
+
+    <button onclick="clearCart()" class="clear-btn">
+      Empty Cart & Go Back
+    </button>
+
+    <!-- AOS + Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+      // Init AOS scroll animations
+      AOS.init({
+        duration: 700,
+        easing: "ease-out-cubic",
+        once: true,
+        offset: 40,
+      });
+
+      let cart = JSON.parse(localStorage.getItem("matri_cart")) || [];
+
+      function renderCart() {
+        const container = document.getElementById("cart-items-container");
+        let total = 0;
+        let waMessage =
+          "Hello Matri Hardwares! Here is my order inquiry:%0A%0A";
+
+        if (cart.length === 0) {
+          container.innerHTML = "<p>Your cart is empty!</p>";
+          document.getElementById("wa-checkout").style.display = "none";
+          return;
+        }
+
+        container.innerHTML = cart
+          .map((item) => {
+            const itemTotal = item.price * item.qty;
+            total += itemTotal;
+            waMessage += `- ${item.qty}x ${item.name} (₹${itemTotal})%0A`;
+            return `
+          <div class="cart-item">
+            <div><strong>${item.name}</strong><br>Qty: ${item.qty}</div>
+            <div>₹${itemTotal}</div>
+          </div>
+        `;
+          })
+          .join("");
+
+        document.getElementById("grand-total").innerText = total;
+
+        waMessage += `%0A*Base Total: ₹${total}*%0A_Please let me know the final amount including GST._`;
+
+        // Attach the generated message to the button
+        const waButton = document.getElementById("wa-checkout");
+        waButton.href = `https://wa.me/7003723504?text=${waMessage}`;
+      }
+
+      function clearCart() {
+        localStorage.removeItem("matri_cart");
+        window.location.href = "index.html";
+      }
+
+      renderCart();
+    </script>
+    <script
+      type="module"
+      src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496"
+      integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ=="
+      data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79"}'
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>
