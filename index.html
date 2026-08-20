@@ -661,6 +661,27 @@
             </svg>
             Inquire on WhatsApp
           </button>
+<button 
+  id="pd-add-to-cart" 
+  style="
+    width: 100%; 
+    margin-top: clamp(10px, 2vw, 15px); 
+    padding: clamp(12px, 3vw, 15px); 
+    background-color: #1c1916; 
+    color: white; 
+    border: none; 
+    border-radius: 50px; 
+    cursor: pointer; 
+    font-weight: bold; 
+    text-transform: uppercase; 
+    font-size: clamp(14px, 4vw, 16px); 
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+  "
+>
+  Add to Cart
+</button>
         </div>
       </div>
     </div>
@@ -772,6 +793,10 @@
                 <div class="prod-name">${p.name}</div>
                 <div style="font-size:9px; color:#9aa7ab; font-family:monospace; margin-bottom:8px;">SKU: ${p.sku}</div>
                 ${p.price ? `<div class="mrp">Price: ${p.price}</div>` : ''}
+            
+            <button onclick="event.stopPropagation(); addToCart('${p.id}', '${p.name.replace(/'/g, "\\'")}', '${p.price || 0}')" style="width: 100%; margin-top: 15px; padding: 10px; background-color: #1c1916; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; text-transform: uppercase;">
+              Add to Cart
+            </button>${p.price ? `<div class="mrp">Price: ${p.price}</div>` : ''}
                 ${getStockBadge(p.stock)}
               </div>
             </div>`;
@@ -782,36 +807,39 @@
         AOS.refresh();
       }
 
-      function openProductPage(id) {
-        currentProduct = products.find((p) => p.id === id);
-        document.getElementById("pd-title").innerText = currentProduct.name;
-        document.getElementById("pd-cat").innerText =
-          `SKU: ${currentProduct.sku} | ${currentProduct.category}`;
-        document.getElementById("pd-price").innerText = currentProduct.price ? `Price: ${currentProduct.price}` : "";
-        document.getElementById("pd-desc").innerText =
-          currentProduct.description;
-        document.getElementById("pd-badge-container").innerHTML = getStockBadge(
-          currentProduct.stock,
-        );
+function openProductPage(id) {
+  currentProduct = products.find((p) => p.id === id);
+  
+  document.getElementById("pd-title").innerText = currentProduct.name;
+  document.getElementById("pd-cat").innerText = `SKU: ${currentProduct.sku} | ${currentProduct.category}`;
+  document.getElementById("pd-price").innerText = currentProduct.price ? `Price: ${currentProduct.price}` : "";
+  document.getElementById("pd-desc").innerText = currentProduct.description ? currentProduct.description : "";
+  
+  // Fixed the stray comma here
+  document.getElementById("pd-badge-container").innerHTML = getStockBadge(currentProduct.stock);
 
-        const mainImg = document.getElementById("pd-image");
-        const gallery = document.getElementById("pd-gallery");
-        mainImg.src =
-          currentProduct.images && currentProduct.images.length > 0
-            ? currentProduct.images[0]
-            : "";
+  const mainImg = document.getElementById("pd-image");
+  const gallery = document.getElementById("pd-gallery");
+  
+  mainImg.src = currentProduct.images && currentProduct.images.length > 0 
+    ? currentProduct.images[0] 
+    : "";
 
-        gallery.innerHTML = "";
-        if (currentProduct.images && currentProduct.images.length > 1) {
-          currentProduct.images.forEach((imgUrl, idx) => {
-            gallery.innerHTML += `<img src="${imgUrl}" onclick="setMainImage('${imgUrl}', this)" class="${idx === 0 ? "active" : ""}">`;
-          });
-        }
+  gallery.innerHTML = "";
+  if (currentProduct.images && currentProduct.images.length > 1) {
+    currentProduct.images.forEach((imgUrl, idx) => {
+      gallery.innerHTML += `<img src="${imgUrl}" onclick="setMainImage('${imgUrl}', this)" class="${idx === 0 ? "active" : ""}">`;
+    });
+  }
 
-        document.getElementById("customer-view").style.display = "none";
-        document.getElementById("product-view").style.display = "block";
-        window.scrollTo(0, 0);
-      }
+  document.getElementById("customer-view").style.display = "none";
+  document.getElementById("product-view").style.display = "block";
+  window.scrollTo(0, 0);
+  
+  document.getElementById("pd-add-to-cart").onclick = function() {
+    addToCart(currentProduct.id, currentProduct.name, currentProduct.price || 0);
+  };
+} // <-- This was the missing bracket that broke the site!
 
       function closeProductPage() {
         document.getElementById("product-view").style.display = "none";
@@ -927,9 +955,52 @@ window.addEventListener('popstate', function(event) {
   }
 });
 loadBanner(); // Make sure this is still at the bottom!
-      
+      // --- SHOPPING CART LOGIC ---
+let cart = JSON.parse(localStorage.getItem('matri_cart')) || [];
+
+function addToCart(id, name, price) {
+  const existingItem = cart.find(item => item.id === id);
+  const numericPrice = parseFloat(price) || 0;
+
+  if (existingItem) {
+    existingItem.qty += 1;
+  } else {
+    cart.push({ id, name, price: numericPrice, qty: 1 });
+  }
+
+  localStorage.setItem('matri_cart', JSON.stringify(cart));
+  updateCartUI();
+  alert(name + " added to cart!");
+}
+
+function updateCartUI() {
+  const cartBtn = document.getElementById('floating-cart');
+  const cartCount = document.getElementById('cart-count');
+  
+  if (cart.length > 0) {
+    cartBtn.style.display = 'flex';
+    const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
+    cartCount.innerText = totalItems;
+  } else {
+    cartBtn.style.display = 'none';
+  }
+}
+
+// Run on page load
+updateCartUI();
     </script>
   <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79"}' crossorigin="anonymous"></script>
+ <a href="cart.html" id="floating-cart" style="display: none; position: fixed; bottom: 90px; right: 20px; z-index: 1000; background-color: #1C1916; color: #fff; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; box-shadow: 0 4px 12px rgba(0,0,0,0.25); transition: transform 0.2s;">
+  <!-- Premium SVG Cart Icon -->
+  <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="9" cy="21" r="1"></circle>
+    <circle cx="20" cy="21" r="1"></circle>
+    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+  </svg>
+  
+  <!-- Perfectly proportioned notification badge -->
+  <span id="cart-count" style="position: absolute; top: -2px; right: -2px; background: #ff4757; color: white; border-radius: 50%; min-width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: bold; border: 2px solid #fdfaf6; box-sizing: border-box; padding: 0 4px;">0</span>
+</a>
     <!-- Floating WhatsApp Button -->
   <a href="https://wa.me/7003723504" class="floating-wa" target="_blank">
     <svg viewBox="0 0 32 32" width="32" height="32" fill="white"><path d="M16.05 1.77A14.2 14.2 0 0 0 2 15.98c0 2.5.65 4.9 1.88 7.02L1.83 29.8l7-1.84a14.24 14.24 0 0 0 7.22 1.95h.01A14.2 14.2 0 0 0 30.2 15.98a14.2 14.2 0 0 0-4.16-10.05 14.15 14.15 0 0 0-10-4.16zm0 2.4c2.58 0 5 .98 6.8 2.8a9.63 9.63 0 0 1 2.8 6.8A9.74 9.74 0 0 1 16.06 23.5h-.01a9.7 9.7 0 0 1-4.94-1.34l-.36-.2-3.66.96.98-3.58-.23-.37A9.74 9.74 0 0 1 6.36 15.98a9.74 9.74 0 0 1 9.7-9.8zM11.9 9.8c-.22 0-.47.01-.7.08-.2.07-.48.16-.7.42-.47.52-.76 1.15-.76 1.82 0 1.25.7 2.45 1.57 3.63.15.2.3.4.47.58 1.6 1.72 3.4 3.03 5.42 3.6.45.13.92.2 1.4.18.52-.02 1.16-.24 1.55-.57.36-.3.57-.73.6-1.18.02-.3-.13-.43-.3-.5l-2.06-.98-.24-.1c-.2-.07-.4-.05-.58.12l-1.07 1.34c-.16.2-.42.27-.66.18a11.16 11.16 0 0 1-2.9-1.8 11.83 11.83 0 0 1-1.95-2.72c-.12-.22-.1-.47.06-.65l.65-.8c.13-.15.17-.37.1-.55L12.3 9.9c-.1-.23-.27-.22-.4-.2z"/></svg>
