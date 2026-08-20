@@ -763,7 +763,7 @@
         return `<span class="badge hi">In Stock</span>`;
       }
 
-     function renderCatalogue() {
+    function renderCatalogue() {
         const container = document.getElementById("catalog-container");
         container.innerHTML = "";
         let filtered =
@@ -776,38 +776,58 @@
           return;
         }
 
+        // 1. Group by Category, then by Sub-Category
         const grouped = {};
         filtered.forEach((p) => {
-          if (!grouped[p.category]) grouped[p.category] = [];
-          grouped[p.category].push(p);
+          if (!grouped[p.category]) grouped[p.category] = {};
+          
+          // If admin leaves it blank, it goes into "General" and hides the subtitle
+          const subCat = (p.sub_category && p.sub_category.trim() !== "") ? p.sub_category.trim() : "General";
+          
+          if (!grouped[p.category][subCat]) grouped[p.category][subCat] = [];
+          grouped[p.category][subCat].push(p);
         });
 
+        // 2. Render the beautifully grouped HTML
         for (const cat in grouped) {
-          let html = `<div class="section"><div class="section-header" data-aos="fade-right"><h2>${cat}</h2></div><div class="product-grid">`;
-          grouped[cat].forEach((p, idx) => {
-            const coverImg = p.images && p.images.length > 0 ? p.images[0] : "";
+          let html = `<div class="section"><div class="section-header" data-aos="fade-right"><h2>${cat}</h2></div>`;
+          
+          for (const subCat in grouped[cat]) {
+            // Draw the elegant sub-category divider (like "Vitrossa Set") with the thin line!
+            if (subCat !== "General") {
+              html += `
+              <div style="display: flex; align-items: center; margin: 45px 0 25px 0;">
+                <div style="font-family: 'Cormorant Garamond', serif; font-size: 22px; font-style: italic; color: #222; padding-right: 20px;">${subCat}</div>
+                <div style="flex-grow: 1; height: 1px; background-color: #dcd7cb;"></div>
+              </div>`;
+            }
             
-            // Smart fix: If admin accidentally types "SKU:" in the database, this removes the duplicate!
-            let cleanSku = p.sku ? p.sku.replace(/^SKU:\s*/i, '') : '';
+            html += `<div class="product-grid">`;
+            
+            grouped[cat][subCat].forEach((p, idx) => {
+              const coverImg = p.images && p.images.length > 0 ? p.images[0] : "";
+              let cleanSku = p.sku ? p.sku.replace(/^SKU:\s*/i, '') : '';
 
-            html += `
-            <div class="card" data-aos="fade-up" data-aos-delay="${(idx % 4) * 90}" onclick="openProductPage(${p.id})">
-              <div class="img-box"><img src="${coverImg}" alt="${p.name}"></div>
-              <div class="card-body">
-                <div class="prod-name">${p.name}</div>
-                <div style="font-size:11px; color:#9aa7ab; font-family:monospace; margin-bottom:8px;">SKU: ${cleanSku}</div>
-                
-                ${p.price ? `<div class="mrp" style="font-size: 16px; margin-bottom: 12px; font-weight: 600;">Price: ${p.price}</div>` : ''}
-            
-                <button onclick="event.stopPropagation(); addToCart('${p.id}', '${p.name.replace(/'/g, "\\'")}', '${p.price || 0}')" style="width: 100%; margin-bottom: 15px; padding: 10px; background-color: #1c1916; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; text-transform: uppercase; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
-                  Add to Cart
-                </button>
-                
-                ${getStockBadge(p.stock)}
-              </div>
-            </div>`;
-          });
-          html += `</div></div>`;
+              html += `
+              <div class="card" data-aos="fade-up" data-aos-delay="${(idx % 4) * 90}" onclick="openProductPage(${p.id})">
+                <div class="img-box"><img src="${coverImg}" alt="${p.name}"></div>
+                <div class="card-body">
+                  <div class="prod-name">${p.name}</div>
+                  <div style="font-size:11px; color:#9aa7ab; font-family:monospace; margin-bottom:8px;">SKU: ${cleanSku}</div>
+                  
+                  ${p.price ? `<div class="mrp" style="font-size: 16px; margin-bottom: 12px; font-weight: 600;">Price: ${p.price}</div>` : ''}
+              
+                  <button onclick="event.stopPropagation(); addToCart('${p.id}', '${p.name.replace(/'/g, "\\'")}', '${p.price || 0}')" style="width: 100%; margin-bottom: 15px; padding: 10px; background-color: #1c1916; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; text-transform: uppercase; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
+                    Add to Cart
+                  </button>
+                  
+                  ${getStockBadge(p.stock)}
+                </div>
+              </div>`;
+            });
+            html += `</div>`; 
+          }
+          html += `</div>`; 
           container.innerHTML += html;
         }
         AOS.refresh();
