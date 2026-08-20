@@ -763,7 +763,7 @@
         return `<span class="badge hi">In Stock</span>`;
       }
 
-      function renderCatalogue() {
+     function renderCatalogue() {
         const container = document.getElementById("catalog-container");
         container.innerHTML = "";
         let filtered =
@@ -786,17 +786,23 @@
           let html = `<div class="section"><div class="section-header" data-aos="fade-right"><h2>${cat}</h2></div><div class="product-grid">`;
           grouped[cat].forEach((p, idx) => {
             const coverImg = p.images && p.images.length > 0 ? p.images[0] : "";
+            
+            // Smart fix: If admin accidentally types "SKU:" in the database, this removes the duplicate!
+            let cleanSku = p.sku ? p.sku.replace(/^SKU:\s*/i, '') : '';
+
             html += `
             <div class="card" data-aos="fade-up" data-aos-delay="${(idx % 4) * 90}" onclick="openProductPage(${p.id})">
               <div class="img-box"><img src="${coverImg}" alt="${p.name}"></div>
               <div class="card-body">
                 <div class="prod-name">${p.name}</div>
-                <div style="font-size:9px; color:#9aa7ab; font-family:monospace; margin-bottom:8px;">SKU: ${p.sku}</div>
-                ${p.price ? `<div class="mrp">Price: ${p.price}</div>` : ''}
+                <div style="font-size:11px; color:#9aa7ab; font-family:monospace; margin-bottom:8px;">SKU: ${cleanSku}</div>
+                
+                ${p.price ? `<div class="mrp" style="font-size: 16px; margin-bottom: 12px; font-weight: 600;">Price: ${p.price}</div>` : ''}
             
-            <button onclick="event.stopPropagation(); addToCart('${p.id}', '${p.name.replace(/'/g, "\\'")}', '${p.price || 0}')" style="width: 100%; margin-top: 15px; padding: 10px; background-color: #1c1916; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; text-transform: uppercase;">
-              Add to Cart
-            </button>${p.price ? `<div class="mrp">Price: ${p.price}</div>` : ''}
+                <button onclick="event.stopPropagation(); addToCart('${p.id}', '${p.name.replace(/'/g, "\\'")}', '${p.price || 0}')" style="width: 100%; margin-bottom: 15px; padding: 10px; background-color: #1c1916; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; text-transform: uppercase; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
+                  Add to Cart
+                </button>
+                
                 ${getStockBadge(p.stock)}
               </div>
             </div>`;
